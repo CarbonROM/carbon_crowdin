@@ -3,10 +3,10 @@
 # crowdin_sync.py
 #
 # Updates Crowdin source translations and pushes translations
-# directly to OmniROM's Gerrit.
+# directly to CarbonROM's Gerrit.
 #
 # Copyright (C) 2014 The CyanogenMod Project
-# Modifications Copyright (C) 2014 OmniROM
+# Modifications Copyright (C) 2014 CarbonROM
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ def push_as_commit(base_path, path, name, branch, username):
 
     # Push commit
     try:
-        repo.git.push('ssh://%s@gerrit.omnirom.org:29418/%s' % (username, name),
+        repo.git.push('ssh://%s@review.carbonrom.org:29418/%s' % (username, name),
                       'HEAD:refs/for/%s%%topic=translation' % branch)
         print('Successfully pushed commit for %s' % name)
     except:
@@ -107,10 +107,10 @@ def find_xml(base_path):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Synchronising OmniROM's translations with Crowdin")
+        description="Synchronising CarbonROM's translations with Crowdin")
     sync = parser.add_mutually_exclusive_group()
     parser.add_argument('-u', '--username', help='Gerrit username')
-    parser.add_argument('-b', '--branch', help='OmniROM branch')
+    parser.add_argument('-b', '--branch', help='CarbonROM branch')
     parser.add_argument('-c', '--config', help='Custom yaml config')
     parser.add_argument('--upload-sources', action='store_true',
                         help='Upload sources to Crowdin')
@@ -320,24 +320,24 @@ def main():
     args = parse_args()
     default_branch = args.branch
 
-    base_path = os.getenv('OMNI_CROWDIN_BASE_PATH')
+    base_path = os.getenv('CARBON_CROWDIN_BASE_PATH')
     if base_path is None:
-        print('You have not set OMNI_CROWDIN_BASE_PATH')
+        print('You have not set CARBON_CROWDIN_BASE_PATH')
         sys.exit(1)
     if default_branch is None:
-        default_branch = os.getenv('OMNI_CROWDIN_BRANCH')
+        default_branch = os.getenv('CARBON_CROWDIN_BRANCH')
         if default_branch is None:
-            print('You have not set OMNI_CROWDIN_BRANCH')
+            print('You have not set CARBON_CROWDIN_BRANCH')
             sys.exit(1)
 
     if not check_dependencies():
         sys.exit(1)
 
-    xml_android = load_xml(x='%s/android/omni-default.xml' % base_path)
+    xml_android = load_xml(x='%s/android/carbon-default.xml' % base_path)
     if xml_android is None:
         sys.exit(1)
 
-    xml_extra1 = load_xml(x='%s/android/omni-aosp.xml' % base_path)
+    xml_extra1 = load_xml(x='%s/android/carbon-aosp.xml' % base_path)
     if xml_extra1 is None:
         sys.exit(1)
 

@@ -1,5 +1,5 @@
 [gerrit]
-host=gerrit.omnirom.org
+host=review.carbonrom.org
 port=29418
-project=omni_crowdin
-defaultbranch=android-4.4
+project=carbon_crowdin
+defaultbranch=cr-6.1
