@@ -31,6 +31,7 @@ import subprocess
 import sys
 
 from xml.dom import minidom
+from lxml import etree
 
 # ################################# GLOBALS ################################## #
 
@@ -207,17 +208,33 @@ def download_crowdin(base_path, branch, xml, username, config):
         ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
          ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
         ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>')
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
+        ('<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
+        ('<resources xmlns:android='
+         '"http://schemas.android.com/apk/res/android">\n</resources>'),
+        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
+        ('<resources xmlns:tools="http://schemas.android.com/tools"'
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>')
     }
+
     xf = None
+    dom1 = None
     for xml_file in find_xml(base_path):
-        xf = open(xml_file).read()
-        for line in empty_contents:
-            if line in xf:
-                print('Removing ' + xml_file)
-                os.remove(xml_file)
-                break
+        try:
+            tree = etree.fromstring(open(xml_file).read())
+            etree.strip_tags(tree,etree.Comment)
+            treestring = etree.tostring(tree)
+            xf = "".join([s for s in treestring.strip().splitlines(True) if s.strip()])
+            for line in empty_contents:
+                if line in xf:
+                    print('Removing ' + xml_file)
+                    os.remove(xml_file)
+                    break
+        except etree.XMLSyntaxError:
+            # Ignored, we only check for empty strings, syntax will be checked at buildtime
     del xf
+    del dom1
 
     print('\nCreating a list of pushable translations')
     # Get all files that Crowdin pushed
@@ -304,17 +321,33 @@ def local_download(base_path, branch, xml, config):
         ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
          ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
         ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>')
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
+        ('<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
+        ('<resources xmlns:android='
+         '"http://schemas.android.com/apk/res/android">\n</resources>'),
+        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
+        ('<resources xmlns:tools="http://schemas.android.com/tools"'
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>')
     }
+
     xf = None
+    dom1 = None
     for xml_file in find_xml(base_path):
-        xf = open(xml_file).read()
-        for line in empty_contents:
-            if line in xf:
-                print('Removing ' + xml_file)
-                os.remove(xml_file)
-                break
+        try:
+            tree = etree.fromstring(open(xml_file).read())
+            etree.strip_tags(tree,etree.Comment)
+            treestring = etree.tostring(tree)
+            xf = "".join([s for s in treestring.strip().splitlines(True) if s.strip()])
+            for line in empty_contents:
+                if line in xf:
+                    print('Removing ' + xml_file)
+                    os.remove(xml_file)
+                    break
+        except etree.XMLSyntaxError:
+            # Ignored, we only check for empty strings, syntax will be checked at buildtime
     del xf
+    del dom1
 
 def main():
     args = parse_args()
