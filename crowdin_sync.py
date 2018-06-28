@@ -184,8 +184,7 @@ def upload_translations_crowdin(branch, config):
                    '--no-import-duplicates', '--import-eq-suggestions',
                    '--auto-approve-imported'])
 
-
-def download_crowdin(base_path, branch, xml, username, config):
+def local_download(base_path, branch, xml, config):
     if config:
         print('\nDownloading translations from Crowdin (custom config)')
         check_run(['crowdin-cli',
@@ -236,6 +235,8 @@ def download_crowdin(base_path, branch, xml, username, config):
     del xf
     del dom1
 
+def download_crowdin(base_path, branch, xml, username, config):
+    local_download(base_path, branch, xml, config)
     print('\nCreating a list of pushable translations')
     # Get all files that Crowdin pushed
     paths = []
@@ -297,57 +298,6 @@ def download_crowdin(base_path, branch, xml, username, config):
             push_as_commit(base_path, result,
                            project.getAttribute('name'), br, username)
             break
-
-def local_download(base_path, branch, xml, config):
-    if config:
-        print('\nDownloading translations from Crowdin (custom config)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s' % (_DIR, config),
-                   'download', '--branch=%s' % branch])
-    else:
-        print('\nDownloading translations from Crowdin '
-              '(AOSP supported languages)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s.yaml' % (_DIR, branch),
-                   'download', '--branch=%s' % branch])
-
-
-    print('\nRemoving useless empty translation files')
-    empty_contents = {
-        '<resources/>',
-        '<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>',
-        ('<resources xmlns:android='
-         '"http://schemas.android.com/apk/res/android"/>'),
-        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
-        ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
-        ('<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
-        ('<resources xmlns:android='
-         '"http://schemas.android.com/apk/res/android">\n</resources>'),
-        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
-        ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>')
-    }
-
-    xf = None
-    dom1 = None
-    for xml_file in find_xml(base_path):
-        try:
-            tree = etree.fromstring(open(xml_file).read())
-            etree.strip_tags(tree,etree.Comment)
-            treestring = etree.tostring(tree)
-            xf = "".join([s for s in treestring.strip().splitlines(True) if s.strip()])
-            for line in empty_contents:
-                if line in xf:
-                    print('Removing ' + xml_file)
-                    os.remove(xml_file)
-                    break
-        except etree.XMLSyntaxError:
-            # Ignored, we only check for empty strings, syntax will be checked at buildtime
-    del xf
-    del dom1
 
 def main():
     args = parse_args()
