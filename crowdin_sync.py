@@ -214,7 +214,8 @@ def local_download(base_path, branch, xml, config):
         ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
          ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
         ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>')
+         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
+        ('<resources>\n</resources>')
     }
 
     xf = None
