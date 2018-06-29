@@ -98,12 +98,6 @@ def check_run(cmd):
         print('Failed to run cmd: %s' % ' '.join(cmd), file=sys.stderr)
         sys.exit(ret)
 
-def find_xml(base_path):
-    for dp, dn, file_names in os.walk(base_path):
-        for f in file_names:
-            if os.path.splitext(f)[1] == '.xml':
-                yield os.path.join(dp, f)
-
 # ############################################################################ #
 
 def parse_args():
@@ -158,45 +152,39 @@ def check_files(files):
 def upload_sources_crowdin(branch, config):
     if config:
         print('\nUploading sources to Crowdin (custom config)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s' % (_DIR, config),
-                   'upload', 'sources', '--branch=%s' % branch])
     else:
         print('\nUploading sources to Crowdin (AOSP supported languages)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s.yaml' % (_DIR, branch),
-                   'upload', 'sources', '--branch=%s' % branch])
+        config=branch + ".yaml"
+
+    check_run(['crowdin-cli',
+                '--config=%s/config/%s' % (_DIR, config),
+               'upload', 'sources', '--branch=%s' % branch])
 
 def upload_translations_crowdin(branch, config):
     if config:
         print('\nUploading translations to Crowdin (custom config)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s' % (_DIR, config),
-                   'upload', 'translations', '--branch=%s' % branch,
-                   '--no-import-duplicates', '--import-eq-suggestions',
-                   '--auto-approve-imported'])
     else:
         print('\nUploading translations to Crowdin '
               '(AOSP supported languages)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s.yaml' % (_DIR, branch),
-                   'upload', 'translations', '--branch=%s' % branch,
-                   '--no-import-duplicates', '--import-eq-suggestions',
-                   '--auto-approve-imported'])
+        config=branch + ".yaml"
+
+    check_run(['crowdin-cli',
+                '--config=%s/config/%s' % (_DIR, config),
+               'upload', 'translations', '--branch=%s' % branch,
+               '--no-import-duplicates', '--import-eq-suggestions',
+               '--auto-approve-imported'])
 
 def local_download(base_path, branch, xml, config):
     if config:
         print('\nDownloading translations from Crowdin (custom config)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s' % (_DIR, config),
-                   'download', '--branch=%s' % branch])
     else:
         print('\nDownloading translations from Crowdin '
               '(AOSP supported languages)')
-        check_run(['crowdin-cli',
-                   '--config=%s/config/%s.yaml' % (_DIR, branch),
-                   'download', '--branch=%s' % branch])
+        config=branch + ".yaml"
 
+    check_run(['crowdin-cli',
+               '--config=%s/config/%s' % (_DIR, config),
+               'download', '--branch=%s' % branch])
 
     print('\nRemoving useless empty translation files')
     empty_contents = {
@@ -220,20 +208,29 @@ def local_download(base_path, branch, xml, config):
 
     xf = None
     dom1 = None
-    for xml_file in find_xml(base_path):
+    cmd = ['crowdin-cli', '--config=%s/config/%s' % (_DIR, config), 'list', 'translations']
+    comm, ret = run_subprocess(cmd)
+    if ret != 0:
+        sys.exit(ret)
+    # Split in list and remove last empty entry
+    xml_list=str(comm[0]).split("\n")[:-1]
+    for xml_file in xml_list:
         try:
-            tree = etree.fromstring(open(xml_file).read())
+            tree = etree.fromstring(open(base_path + xml_file).read())
             etree.strip_tags(tree,etree.Comment)
             treestring = etree.tostring(tree)
             xf = "".join([s for s in treestring.strip().splitlines(True) if s.strip()])
             for line in empty_contents:
                 if line in xf:
-                    print('Removing ' + xml_file)
-                    os.remove(xml_file)
+                    print('Removing ' + base_path + xml_file)
+                    os.remove(base_path + xml_file)
                     break
+        except IOError:
+            print("File not found: " + xml_file)
+            sys.exit(1)
         except etree.XMLSyntaxError:
-            # Ignored, we only check for empty strings, syntax will be checked at buildtime
-            pass
+            print("XML Syntax error in file: " + xml_file)
+            sys.exit(1)
     del xf
     del dom1
 
