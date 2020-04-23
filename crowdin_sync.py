@@ -216,10 +216,11 @@ def local_download(base_path, branch, xml, config):
     xml_list=str(comm[0]).split("\n")[:-1]
     for xml_file in xml_list:
         try:
-            tree = etree.fromstring(open(base_path + xml_file).read())
+            print("opening "+ base_path + xml_file)
+            tree = etree.XML(open(base_path + xml_file).read().encode())
             etree.strip_tags(tree,etree.Comment)
-            treestring = etree.tostring(tree)
-            xf = "".join([s for s in treestring.strip().splitlines(True) if s.strip()])
+            treestring = etree.tostring(tree,encoding='UTF-8')
+            xf = "".join([s for s in treestring.decode().strip().splitlines(True) if s.strip()])
             for line in empty_contents:
                 if line in xf:
                     print('Removing ' + base_path + xml_file)
