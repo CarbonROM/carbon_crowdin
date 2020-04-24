@@ -77,17 +77,12 @@ def push_as_commit(base_path, path, name, branch, username):
     # Create commit; if it fails, probably empty so skipping
     try:
         repo.git.commit(m='Automatic translation import')
-    except:
-        print('Failed to create commit for %s, probably empty: skipping'
-              % name, file=sys.stderr)
-
-    # Push commit
-    try:
         repo.git.push('ssh://%s@review.carbonrom.org:29418/%s' % (username, name),
                       'HEAD:refs/for/%s%%topic=translation' % branch)
         print('Successfully pushed commit for %s' % name)
     except:
-        print('Failed to push commit for %s' % name, file=sys.stderr)
+        print('Failed to create or push commit for %s, probably empty: skipping'
+              % name, file=sys.stderr)
 
     _COMMITS_CREATED = True
 
