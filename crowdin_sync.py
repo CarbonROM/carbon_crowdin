@@ -115,10 +115,10 @@ def parse_args():
 # ################################# PREPARE ################################## #
 
 def check_dependencies():
-    # Check for Ruby version of crowdin-cli
-    cmd = ['gem', 'list', 'crowdin-cli', '-i']
+    # Check for crowdin tool
+    cmd = ['which', 'crowdin']
     if run_subprocess(cmd, silent=True)[1] != 0:
-        print('You have not installed crowdin-cli.', file=sys.stderr)
+        print('You have not installed crowdin.', file=sys.stderr)
         return False
     return True
 
@@ -151,9 +151,9 @@ def upload_sources_crowdin(branch, config):
         print('\nUploading sources to Crowdin (AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-                '--config=%s/config/%s' % (_DIR, config),
-               'upload', 'sources', '--branch=%s' % branch])
+    check_run(['crowdin', 'upload', 'sources',
+                '--config', '%s/config/%s' % (_DIR, config),
+                '--branch=%s' % branch])
 
 def upload_translations_crowdin(branch, config):
     if config:
@@ -163,9 +163,9 @@ def upload_translations_crowdin(branch, config):
               '(AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-                '--config=%s/config/%s' % (_DIR, config),
-               'upload', 'translations', '--branch=%s' % branch,
+    check_run(['crowdin', 'upload', 'translations', 
+               '--config', '%s/config/%s' % (_DIR, config),
+               '--branch=%s' % branch,
                '--no-import-duplicates', '--import-eq-suggestions',
                '--auto-approve-imported'])
 
@@ -177,58 +177,9 @@ def local_download(base_path, branch, xml, config):
               '(AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-               '--config=%s/config/%s' % (_DIR, config),
-               'download', '--branch=%s' % branch])
-
-    print('\nRemoving useless empty translation files')
-    empty_contents = {
-        '<resources/>',
-        '<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>',
-        ('<resources xmlns:android='
-         '"http://schemas.android.com/apk/res/android"/>'),
-        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
-        ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>'),
-        ('<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
-        ('<resources xmlns:android='
-         '"http://schemas.android.com/apk/res/android">\n</resources>'),
-        ('<resources xmlns:android="http://schemas.android.com/apk/res/android"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
-        ('<resources xmlns:tools="http://schemas.android.com/tools"'
-         ' xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">\n</resources>'),
-        ('<resources>\n</resources>')
-    }
-
-    xf = None
-    dom1 = None
-    cmd = ['crowdin-cli', '--config=%s/config/%s' % (_DIR, config), 'list', 'translations']
-    comm, ret = run_subprocess(cmd)
-    if ret != 0:
-        sys.exit(ret)
-    # Split in list and remove last empty entry
-    xml_list=str(comm[0]).split("\n")[:-1]
-    for xml_file in xml_list:
-        try:
-            print("opening "+ base_path + xml_file)
-            tree = etree.XML(open(base_path + xml_file).read().encode())
-            etree.strip_tags(tree,etree.Comment)
-            treestring = etree.tostring(tree,encoding='UTF-8')
-            xf = "".join([s for s in treestring.decode().strip().splitlines(True) if s.strip()])
-            for line in empty_contents:
-                if line in xf:
-                    print('Removing ' + base_path + xml_file)
-                    os.remove(base_path + xml_file)
-                    break
-        except IOError:
-            print("File not found: " + xml_file)
-            sys.exit(1)
-        except etree.XMLSyntaxError:
-            print("XML Syntax error in file: " + xml_file)
-            sys.exit(1)
-    del xf
-    del dom1
+    check_run(['crowdin', 'download', 
+               '--config', '%s/config/%s' % (_DIR, config),
+               '--branch=%s' % branch])
 
 def download_crowdin(base_path, branch, xml, username, config):
     local_download(base_path, branch, xml, config)
@@ -240,7 +191,7 @@ def download_crowdin(base_path, branch, xml, username, config):
     else:
         files = ['%s/config/%s.yaml' % (_DIR, branch)]
     for c in files:
-        cmd = ['crowdin-cli', '--config=%s' % c, 'list', 'project',
+        cmd = ['crowdin', 'list', 'project', '--plain', '--config', '%s' % c,
                '--branch=%s' % branch]
         comm, ret = run_subprocess(cmd)
         if ret != 0:
