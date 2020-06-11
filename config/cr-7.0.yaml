@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-api_key_env: CARBON_CROWDIN_API_KEY
+api_token_env: CARBON_CROWDIN_API_KEY
 base_path_env: CARBON_CROWDIN_BASE_PATH
+project_id: 59820
 base_path_contains_branch_subfolders: false
-project_identifier: carbonrom
 preserve_hierarchy: true
 
 files:

@@ -116,7 +116,7 @@ def parse_args():
 
 def check_dependencies():
     # Check for Ruby version of crowdin-cli
-    cmd = ['gem', 'list', 'crowdin-cli', '-i']
+    cmd = ['which', 'crowdin-cli']
     if run_subprocess(cmd, silent=True)[1] != 0:
         print('You have not installed crowdin-cli.', file=sys.stderr)
         return False
@@ -151,9 +151,9 @@ def upload_sources_crowdin(branch, config):
         print('\nUploading sources to Crowdin (AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-                '--config=%s/config/%s' % (_DIR, config),
-               'upload', 'sources', '--branch=%s' % branch])
+    check_run(['crowdin-cli', 'upload', 'sources',
+                '--config', '%s/config/%s' % (_DIR, config),
+                '--branch=%s' % branch])
 
 def upload_translations_crowdin(branch, config):
     if config:
@@ -163,9 +163,9 @@ def upload_translations_crowdin(branch, config):
               '(AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-                '--config=%s/config/%s' % (_DIR, config),
-               'upload', 'translations', '--branch=%s' % branch,
+    check_run(['crowdin-cli', 'upload', 'translations', 
+               '--config', '%s/config/%s' % (_DIR, config),
+               '--branch=%s' % branch,
                '--no-import-duplicates', '--import-eq-suggestions',
                '--auto-approve-imported'])
 
@@ -177,9 +177,9 @@ def local_download(base_path, branch, xml, config):
               '(AOSP supported languages)')
         config=branch + ".yaml"
 
-    check_run(['crowdin-cli',
-               '--config=%s/config/%s' % (_DIR, config),
-               'download', '--branch=%s' % branch])
+    check_run(['crowdin-cli', 'download', 
+               '--config', '%s/config/%s' % (_DIR, config),
+               '--branch=%s' % branch])
 
     print('\nRemoving useless empty translation files')
     empty_contents = {
@@ -203,7 +203,7 @@ def local_download(base_path, branch, xml, config):
 
     xf = None
     dom1 = None
-    cmd = ['crowdin-cli', '--config=%s/config/%s' % (_DIR, config), 'list', 'translations']
+    cmd = ['crowdin-cli', 'list', 'translations', '--config', '%s/config/%s' % (_DIR, config)]
     comm, ret = run_subprocess(cmd)
     if ret != 0:
         sys.exit(ret)
@@ -240,7 +240,7 @@ def download_crowdin(base_path, branch, xml, username, config):
     else:
         files = ['%s/config/%s.yaml' % (_DIR, branch)]
     for c in files:
-        cmd = ['crowdin-cli', '--config=%s' % c, 'list', 'project',
+        cmd = ['crowdin-cli', 'list', 'project', '--config', '%s' % c,
                '--branch=%s' % branch]
         comm, ret = run_subprocess(cmd)
         if ret != 0:
