@@ -166,7 +166,7 @@ def upload_translations_crowdin(branch, config):
     check_run(['crowdin', 'upload', 'translations', 
                '--config', '%s/config/%s' % (_DIR, config),
                '--branch=%s' % branch,
-               '--no-import-duplicates', '--import-eq-suggestions',
+               '--import-eq-suggestions',
                '--auto-approve-imported'])
 
 def local_download(base_path, branch, xml, config):
