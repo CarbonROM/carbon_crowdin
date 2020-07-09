@@ -125,6 +125,13 @@
     "languages_mapping" : *anchor
   },
 
+#CarbonSetupWizard
+  {
+    "source" : "/packages/apps/CarbonSetupWizard/res/values/strings.xml",
+    "translation" : "/packages/apps/CarbonSetupWizard/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
 # DeskClock
   {
     "source" : "/packages/apps/DeskClock/res/values/cm_strings.xml",
