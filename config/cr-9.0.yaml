@@ -105,6 +105,13 @@
     "languages_mapping" : *anchor
   },
 
+# PackageInstaller
+  {
+    "source" : "/frameworks/base/packages/PackageInstaller/res/values/cr_strings.xml",
+    "translation" : "/frameworks/base/packages/PackageInstaller/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
 # Packages
 # CarbonDelta
   {
