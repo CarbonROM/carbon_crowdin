@@ -1,0 +1,184 @@
+# android-8.1.yaml
+#
+# Crowdin configuration file for CarbonROM
+#
+# Copyright (C) 2017 CarbonROM
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"api_token_env" : "CARBON_CROWDIN_API_KEY"
+"base_path_env" : "CARBON_CROWDIN_BASE_PATH"
+"project_id" : "59820"
+"base_path_contains_branch_subfolders" : false
+"preserve_hierarchy" : true
+
+"files": [
+# Frameworks
+# framework-res
+  {
+    "source" : "/frameworks/base/core/res/res/values/cr_strings.xml",
+    "translation" : "/frameworks/base/core/res/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : &anchor {
+      "android_code" : {
+        "af": "af",
+        "am": "am",
+        "ar": "ar",
+        "az": "az-rAZ",
+        "be": "be",
+        "bg": "bg",
+        "ca": "ca",
+        "cs": "cs",
+        "da": "da",
+        "de": "de",
+        "el": "el",
+        "en-GB": "en-rGB",
+        "es-ES": "es",
+        "et": "et",
+        "fa": "fa",
+        "fi": "fi",
+        "fr": "fr",
+        "he": "iw",
+        "hi": "hi",
+        "hr": "hr",
+        "hu": "hu",
+        "hy-AM": "hy",
+        "id": "in",
+        "it": "it",
+        "ja": "ja",
+        "ka": "ka",
+        "km": "km",
+        "ko": "ko",
+        "lo": "lo-rLA",
+        "lt": "lt",
+        "lv": "lv",
+        "mn": "mn",
+        "ms": "ms",
+        "no": "no",
+        "ne-NP": "ne",
+        "nl": "nl",
+        "pl": "pl",
+        "pt-PT": "pt-rPT",
+        "pt-BR": "pt-rBR",
+        "rm-CH": "rm",
+        "ro": "ro",
+        "ru": "ru",
+        "si-LK": "si",
+        "sk": "sk",
+        "sl": "sl",
+        "sr": "sr",
+        "sv-SE": "sv",
+        "sw": "sw",
+        "th": "th",
+        "tl": "tl",
+        "tr": "tr",
+        "uk": "uk",
+        "vi": "vi",
+        "zh-CN": "zh-rCN",
+        "zh-HK": "zh-rHK",
+        "zh-TW": "zh-rTW",
+        "zu": "zu"
+      }
+    }
+  },
+
+# SettingsLib
+  {
+    "source" : "/frameworks/base/packages/SettingsLib/res/values/cr_strings.xml",
+    "translation" : "/frameworks/base/packages/SettingsLib/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# SystemUI
+  {
+    "source" : "/frameworks/base/packages/SystemUI/res/values/cr_strings.xml",
+    "translation" : "/frameworks/base/packages/SystemUI/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# Packages
+# CarbonDelta
+  {
+    "source" : "/packages/apps/CarbonDelta/res/values/strings.xml",
+    "translation" : "/packages/apps/CarbonDelta/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+#CarbonFibers
+  {
+    "source" : "/packages/apps/CarbonFibers/res/values/strings.xml",
+    "translation" : "/packages/apps/CarbonFibers/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+#CarbonSetupWizard
+  {
+    "source" : "/packages/apps/CarbonSetupWizard/res/values/strings.xml",
+    "translation" : "/packages/apps/CarbonSetupWizard/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# LatinIME
+  {
+    "source" : "/packages/inputmethods/LatinIME/java/res/values/cm_strings.xml",
+    "translation" : "/packages/inputmethods/LatinIME/java/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# Launcher3
+  {
+    "source" : "/packages/apps/Launcher3/res/values/cr_strings.xml",
+    "translation" : "/packages/apps/Launcher3/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+  {
+    "source" : "/packages/apps/Launcher3/res/values/strings.xml",
+    "translation" : "/packages/apps/Launcher3/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# Messaging
+#  {
+#    "source" : "/packages/apps/Messaging/res/values/cr_strings.xml",
+#    "translation" : "/packages/apps/Messaging/res/values-%android_code%/%original_file_name%",
+#    "languages_mapping" : *anchor
+#  },
+  {
+    "source" : "/packages/apps/Messaging/res/values/strings.xml",
+    "translation" : "/packages/apps/Messaging/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# Settings
+  {
+    "source" : "/packages/apps/Settings/res/values/cr_strings.xml",
+    "translation" : "/packages/apps/Settings/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+
+# Snap
+  {
+    "source" : "/packages/apps/Snap/res/values/cm_strings.xml",
+    "translation" : "/packages/apps/Snap/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+  {
+    "source" : "/packages/apps/Snap/res/values/qcomstrings.xml",
+    "translation" : "/packages/apps/Snap/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  },
+  {
+    "source" : "/packages/apps/Snap/res/values/strings.xml",
+    "translation" : "/packages/apps/Snap/res/values-%android_code%/%original_file_name%",
+    "languages_mapping" : *anchor
+  }
+]
