@@ -3,10 +3,11 @@
 # crowdin_sync.py
 #
 # Updates Crowdin source translations and pushes translations
-# directly to LineageOS' Gerrit.
+# directly to CarbonROM's Gerrit.
 #
 # Copyright (C) 2014-2016 The CyanogenMod Project
 # Copyright (C) 2017-2020 The LineageOS Project
+# Copyright (C) 2021      CarbonROM
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -278,7 +279,7 @@ def push_as_commit(config_files, base_path, path, name, branch, username):
 
     # Push commit
     try:
-        repo.git.push(f'ssh://{username}@review.lineageos.org:29418/{name}',
+        repo.git.push(f'ssh://{username}@review.carbonrom.org:29418/{name}',
                       f'HEAD:refs/for/{branch}%topic=translation')
         print('Success')
     except Exception as e:
@@ -296,7 +297,7 @@ def submit_gerrit(branch, username, owner):
 
     # Find all open translation changes
     cmd = ['ssh', '-p', '29418',
-        f'{username}@review.lineageos.org',
+        f'{username}@review.carbonrom.org',
         'gerrit', 'query',
         'status:open',
         f'branch:{branch}',
@@ -319,7 +320,7 @@ def submit_gerrit(branch, username, owner):
             continue
         # Add Code-Review +2 and Verified+1 labels and submit
         cmd = ['ssh', '-p', '29418',
-        f'{username}@review.lineageos.org',
+        f'{username}@review.carbonrom.org',
         'gerrit', 'review',
         '--verified +1',
         '--code-review +2',
@@ -359,9 +360,9 @@ def find_xml(base_path):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Synchronising LineageOS' translations with Crowdin")
+        description="Synchronising CarbonROM' translations with Crowdin")
     parser.add_argument('-u', '--username', help='Gerrit username')
-    parser.add_argument('-b', '--branch', help='LineageOS branch',
+    parser.add_argument('-b', '--branch', help='CarbonROM branch',
                         required=True)
     parser.add_argument('-c', '--config', help='Custom yaml config')
     parser.add_argument('--upload-sources', action='store_true',
@@ -415,43 +416,30 @@ def check_files(files):
 def upload_sources_crowdin(branch, config, crowdin_path):
     if config:
         print('\nUploading sources to Crowdin (custom config)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{config}',
-                   'upload', 'sources', f'--branch={branch}'])
+        check_run([crowdin_path, 'upload', 'sources', 
+                   '--config', f'{_DIR}/config/{config}',
+                   f'--branch={branch}'])
     else:
         print('\nUploading sources to Crowdin (AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}.yaml',
-                   'upload', 'sources', f'--branch={branch}'])
-
-        print('\nUploading sources to Crowdin (non-AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}_aosp.yaml',
-                   'upload', 'sources', f'--branch={branch}'])
+        check_run([crowdin_path, 'upload', 'sources',
+                   f'--config', f'{_DIR}/config/{branch}.yaml',
+                   f'--branch={branch}'])
 
 
 def upload_translations_crowdin(branch, config, crowdin_path):
     if config:
         print('\nUploading translations to Crowdin (custom config)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{config}',
-                   'upload', 'translations', f'--branch={branch}',
+        check_run([crowdin_path, 'upload', 'translations',
+                   f'--config', f'{_DIR}/config/{config}',
+                   f'--branch={branch}',
                    '--no-import-duplicates', '--import-eq-suggestions',
                    '--auto-approve-imported'])
     else:
         print('\nUploading translations to Crowdin '
               '(AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}.yaml',
-                   'upload', 'translations', f'--branch={branch}',
-                   '--no-import-duplicates', '--import-eq-suggestions',
-                   '--auto-approve-imported'])
-
-        print('\nUploading translations to Crowdin '
-              '(non-AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}_aosp.yaml',
-                   'upload', 'translations', f'--branch={branch}',
+        check_run([crowdin_path, 'upload', 'translations',
+                   f'--config', f'{_DIR}/config/{branch}.yaml',
+                   f'--branch={branch}',
                    '--no-import-duplicates', '--import-eq-suggestions',
                    '--auto-approve-imported'])
 
@@ -459,21 +447,15 @@ def upload_translations_crowdin(branch, config, crowdin_path):
 def download_crowdin(base_path, branch, xml, username, config, crowdin_path):
     if config:
         print('\nDownloading translations from Crowdin (custom config)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{config}',
-                   'download', '--branch=%s' % branch])
+        check_run([crowdin_path, 'download',
+                   f'--config', f'{_DIR}/config/{config}',
+                   '--branch=%s' % branch])
     else:
         print('\nDownloading translations from Crowdin '
               '(AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}.yaml',
-                   'download', f'--branch={branch}'])
-
-        print('\nDownloading translations from Crowdin '
-              '(non-AOSP supported languages)')
-        check_run([crowdin_path,
-                   f'--config={_DIR}/config/{branch}_aosp.yaml',
-                   'download', f'--branch={branch}'])
+        check_run([crowdin_path, 'download',
+                   f'--config', f'{_DIR}/config/{branch}.yaml',
+                   f'--branch={branch}'])
 
     print('\nCreating a list of pushable translations')
     # Get all files that Crowdin pushed
@@ -481,16 +463,15 @@ def download_crowdin(base_path, branch, xml, username, config, crowdin_path):
     if config:
         files = [f'{_DIR}/config/{config}']
     else:
-        files = [f'{_DIR}/config/{branch}.yaml',
-                 f'{_DIR}/config/{branch}_aosp.yaml']
+        files = [f'{_DIR}/config/{branch}.yaml']
     for c in files:
-        cmd = [crowdin_path, f'--config={c}', 'list', 'project',
+        cmd = [crowdin_path, 'list', 'project', '--plain', f'--config', f'{c}',
                f'--branch={branch}']
         comm, ret = run_subprocess(cmd)
         if ret != 0:
             sys.exit(ret)
         for p in str(comm[0]).split("\n"):
-            paths.append(p.replace(f'/{branch}', ''))
+            paths.append(p.replace(f'{branch}', ''))
 
     print('\nUploading translations to Gerrit')
     items = [x for xmlfile in xml for x in xmlfile.findall("//project")]
@@ -579,8 +560,7 @@ def main():
         submit_gerrit(default_branch, args.username, args.owner)
         sys.exit(0)
 
-    base_path_branch_suffix = default_branch.replace('-', '_').replace('.', '_').upper()
-    base_path_env = f'LINEAGE_CROWDIN_BASE_PATH_{base_path_branch_suffix}'
+    base_path_env = f'CARBON_CROWDIN_BASE_PATH'
     base_path = os.getenv(base_path_env)
     if base_path is None:
         cwd = os.getcwd()
@@ -593,29 +573,28 @@ def main():
     if args.path_to_crowdin == 'crowdin' and not check_dependencies():
         sys.exit(1)
 
-    xml_android = load_xml(x=f'{base_path}/android/default.xml')
+    xml_android = load_xml(x=f'{base_path}/android/carbon-default.xml')
     if xml_android is None:
+        sys.exit(1)
+
+    xml_aosp = load_xml(x=f'{base_path}/android/carbon-aosp.xml')
+    if xml_aosp is None:
+        sys.exit(1)
+
+    xml_caf = load_xml(x=f'{base_path}/android/carbon-aosp.xml')
+    if xml_caf is None:
         sys.exit(1)
 
     xml_extra = load_xml(x=f'{_DIR}/config/{default_branch}_extra_packages.xml')
     if xml_extra is None:
         sys.exit(1)
 
-    xml_snippet = load_xml(x=f'{base_path}/android/snippets/lineage.xml')
-    if xml_snippet is None:
-        xml_snippet = load_xml(x=f'{base_path}/android/snippets/cm.xml')
-    if xml_snippet is None:
-        xml_snippet = load_xml(x=f'{base_path}/android/snippets/hal_cm_all.xml')
-    if xml_snippet is not None:
-        xml_files = (xml_android, xml_snippet, xml_extra)
-    else:
-        xml_files = (xml_android, xml_extra)
+    xml_files = (xml_android, xml_aosp, xml_caf, xml_extra)
 
     if args.config:
         files = [f'{_DIR}/config/{args.config}']
     else:
-        files = [f'{_DIR}/config/{default_branch}.yaml',
-                 f'{_DIR}/config/{default_branch}_aosp.yaml']
+        files = [f'{_DIR}/config/{default_branch}.yaml']
     if not check_files(files):
         sys.exit(1)
 
