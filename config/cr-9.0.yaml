@@ -154,13 +154,8 @@
   },
 
 # Messaging
-#  {
-#    "source" : "/packages/apps/Messaging/res/values/cr_strings.xml",
-#    "translation" : "/packages/apps/Messaging/res/values-%android_code%/%original_file_name%",
-#    "languages_mapping" : *anchor
-#  },
   {
-    "source" : "/packages/apps/Messaging/res/values/strings.xml",
+    "source" : "/packages/apps/Messaging/res/values/cr_strings.xml",
     "translation" : "/packages/apps/Messaging/res/values-%android_code%/%original_file_name%",
     "languages_mapping" : *anchor
   },
